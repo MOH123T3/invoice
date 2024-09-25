@@ -4,7 +4,7 @@ export 'dart:io';
 export 'package:flutter/material.dart';
 export 'package:autorepair/view/main_view.dart';
 export 'package:autorepair/view/init_screen/splash.dart';
-export 'package:autorepair/view/invoice_admin/create_invoice/create_invoice.dart';
+export 'package:autorepair/view/invoice_admin/create_account/customer_detail.dart';
 export 'package:autorepair/view/invoice_admin/transaction/transaction.dart';
 export 'package:autorepair/view/side_nav.dart';
 export 'package:autorepair/view/home/home.dart';

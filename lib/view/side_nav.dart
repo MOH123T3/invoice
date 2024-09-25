@@ -1,7 +1,9 @@
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+
 import 'package:autorepair/imports.dart';
 
 class SideNav extends StatefulWidget {
-  const SideNav({Key? key}) : super(key: key);
+  const SideNav({super.key});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -22,9 +24,9 @@ class _SideNavState extends State<SideNav> {
               children: [
                 const SizedBox(height: 10.0),
                 Padding(
-                  padding: const EdgeInsets.all(10.0),
+                  padding: const EdgeInsets.all(6.0),
                   child: Container(
-                    height: 100.0,
+                    height: 50.0,
                     decoration: const BoxDecoration(
                         boxShadow: [
                           BoxShadow(
@@ -35,23 +37,37 @@ class _SideNavState extends State<SideNav> {
                         ],
                         borderRadius: BorderRadius.all(Radius.circular(20.0)),
                         color: Colors.white),
-                    child: const Center(
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          maxRadius: 30.0,
-                          backgroundColor: Colors.black26,
-                          child: TextBuilder(
-                            text: 'Logo',
-                            color: Colors.white,
-                          ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: 15,
                         ),
-                        title: TextBuilder(
-                          text: 'Invoice Management UI',
-                          fontWeight: FontWeight.w600,
-                          textAlign: TextAlign.start,
-                          fontSize: 16,
+                        Image.asset(
+                          'assets/user.png',
+                          height: 25,
                         ),
-                      ),
+                        SizedBox(
+                          width: 15,
+                        ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            TextBuilder(
+                              text: 'Mohit Panchal',
+                              textAlign: TextAlign.start,
+                              fontSize: 10,
+                            ),
+                            TextBuilder(
+                              text: '+91 8003478***',
+                              textAlign: TextAlign.start,
+                              fontSize: 8,
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -72,10 +88,11 @@ class _SideNavState extends State<SideNav> {
                       leading: Icon(
                         drawer.drawer[i].icon,
                         color: Colors.black,
+                        size: 17,
                       ),
                       title: TextBuilder(
                         text: drawer.drawer[i].title,
-                        fontSize: 18.0,
+                        fontSize: 13.0,
                         color: Colors.black,
                       ),
                     );
@@ -91,10 +108,11 @@ class _SideNavState extends State<SideNav> {
                   leading: const Icon(
                     Icons.power_settings_new,
                     color: Colors.black,
+                    size: 17,
                   ),
                   title: const TextBuilder(
                     text: 'Log out',
-                    fontSize: 18.0,
+                    fontSize: 13.0,
                     color: Colors.black,
                   ),
                 ),

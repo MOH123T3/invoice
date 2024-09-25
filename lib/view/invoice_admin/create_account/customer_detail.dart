@@ -1,10 +1,9 @@
 import 'package:get/get.dart';
 import 'package:autorepair/data/customer_profile_database.dart';
 import 'package:autorepair/imports.dart';
-import 'package:autorepair/view/filter_products/filter_products.dart';
+import 'package:autorepair/view/billing/filter_products.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:autorepair/utils/utils.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class CreateInvoiceTemplate extends StatefulWidget {
   const CreateInvoiceTemplate({super.key});
@@ -37,7 +36,7 @@ class _CreateInvoiceTemplateState extends State<CreateInvoiceTemplate> {
         elevation: 0,
         centerTitle: false,
         title: const TextBuilder(
-          text: 'Create Invoice',
+          text: 'Customer Details',
           color: Colors.black,
         ),
         // actions: const [
@@ -57,15 +56,12 @@ class _CreateInvoiceTemplateState extends State<CreateInvoiceTemplate> {
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 15),
           children: [
-            const Row(
-              children: [
-                Icon(Icons.person_4),
-                SizedBox(width: 15.0),
-                TextBuilder(text: 'Customer Details', fontSize: 18.0),
-              ],
+            const SizedBox(height: 20.0),
+            Image.asset(
+              'assets/user.png',
+              height: 100,
             ),
             const SizedBox(height: 20.0),
-            const SizedBox(height: 15.0),
             CustomTextField(
               controller: customerNameTextEditingController,
               label: 'Customer Name',
@@ -117,14 +113,6 @@ class _CreateInvoiceTemplateState extends State<CreateInvoiceTemplate> {
                 }
               },
               title: "NEXT",
-            ),
-            const SizedBox(height: 50),
-            Center(
-              child: FaIcon(
-                FontAwesomeIcons.fileInvoice,
-                size: 50,
-                color: Colors.blueAccent,
-              ),
             ),
           ],
         ),

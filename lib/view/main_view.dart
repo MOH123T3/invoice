@@ -1,7 +1,7 @@
 import 'package:autorepair/imports.dart';
+import 'package:autorepair/view/add_products/spare_part_list.dart';
 import 'package:get/get.dart';
 import 'package:autorepair/view/add_products/add_product.dart';
-import 'package:autorepair/view/add_products/part_list.dart';
 
 class MainView extends StatefulWidget {
   final int initRoute;
@@ -68,27 +68,30 @@ class _MainViewState extends State<MainView> {
   }
 
   dropDown(List<String> items) {
-    return DropdownButtonHideUnderline(
-      child: DropdownButton<String>(
-        alignment: AlignmentDirectional.center,
-        iconSize: 15,
-        icon: const Icon(Icons.more_vert_outlined),
-        items: items.map((String value) {
-          return DropdownMenuItem<String>(
-            value: value,
-            child: TextBuilder(
-              fontSize: 12,
-              text: value,
-            ),
-          );
-        }).toList(),
-        onChanged: (value) {
-          if (value == "Add Products") {
-            Get.to(const AddProduct());
-          } else {
-            Get.to(SpareParts());
-          }
-        },
+    return Padding(
+      padding: const EdgeInsets.only(right: 10),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          alignment: AlignmentDirectional.center,
+          iconSize: 15,
+          icon: const Icon(Icons.more_vert_outlined),
+          items: items.map((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: TextBuilder(
+                fontSize: 12,
+                text: value,
+              ),
+            );
+          }).toList(),
+          onChanged: (value) {
+            if (value == "Add Products") {
+              Get.to(const AddProduct());
+            } else {
+              Get.to(SpareParts());
+            }
+          },
+        ),
       ),
     );
   }

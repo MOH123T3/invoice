@@ -40,8 +40,6 @@ class _HomeState extends State<Home> {
                 shrinkWrap: true,
                 physics: const BouncingScrollPhysics(),
                 itemBuilder: (context, index) {
-                  print('index - $index');
-
                   return StatsCardTile(data: dash, index: index);
                 },
               ),

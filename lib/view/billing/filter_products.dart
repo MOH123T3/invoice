@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:autorepair/data/product_database.dart';
-import 'package:autorepair/view/filter_products/product_invoice.dart';
+import 'package:autorepair/view/billing/product_invoice.dart';
 import 'package:autorepair/widgets/text/text_builder.dart';
 
 class FilterProductsScreen extends StatefulWidget {
@@ -53,6 +53,7 @@ class _FilterProductsScreenState extends State<FilterProductsScreen> {
       ),
       body: FilterListWidget<SparePart>(
         themeData: FilterListThemeData(context,
+            wrapAlignment: WrapAlignment.center,
             headerTheme: HeaderThemeData(
                 headerTextStyle: TextStyle(fontSize: 12),
                 backgroundColor: Colors.white,
@@ -61,12 +62,14 @@ class _FilterProductsScreenState extends State<FilterProductsScreen> {
                 searchFieldBorderRadius: 8),
             choiceChipTheme: ChoiceChipThemeData(
                 selectedBackgroundColor: Colors.greenAccent,
-                backgroundColor: Colors.black12,
-                selectedTextStyle: GoogleFonts.poppins(color: Colors.black),
+                backgroundColor: const Color.fromARGB(255, 202, 200, 200),
+                selectedTextStyle:
+                    GoogleFonts.poppins(color: Colors.black, fontSize: 10),
                 textStyle:
                     GoogleFonts.poppins(color: Colors.black, fontSize: 10),
                 margin: EdgeInsets.symmetric(vertical: 10, horizontal: 5)),
             controlButtonBarTheme: ControlButtonBarThemeData(context,
+                height: 30,
                 backgroundColor: Colors.black,
                 controlButtonTheme: ControlButtonThemeData(
                     textStyle: TextStyle(color: Colors.white)))),

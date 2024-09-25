@@ -88,10 +88,9 @@ class SparePartDatabase {
     // Run migration according database versions
   }
 
-  Future<int> addProduct(SparePart Product) async {
-    print('Product  - $Product');
+  Future<int> addProduct(SparePart product) async {
     var client = await db;
-    return client.insert('spare_part', Product.toMapForDb(),
+    return client.insert('spare_part', product.toMapForDb(),
         conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
