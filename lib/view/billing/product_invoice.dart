@@ -4,6 +4,7 @@ import 'package:autorepair/controller/part_controller.dart';
 import 'package:autorepair/data/customer_profile_database.dart';
 import 'package:autorepair/data/product_database.dart';
 import 'package:autorepair/imports.dart';
+import 'package:autorepair/utils/utils.dart';
 import 'package:autorepair/view/billing/billing.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -21,33 +22,52 @@ class _ProductInvoiceScreenState extends State<ProductInvoiceScreen> {
   final part = PartController();
   var items = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
 
-  var customerProfileDatabase = CustomerProfileDatabaseDatabase();
+  var customerProfileDatabase = CustomerProDatabase();
   TextEditingController labourCharge = TextEditingController();
 
   List<String> selectedItemValue = <String>[];
   List<SparePart> dataList = [];
-  int totalPrice = 0;
+  List<SparePart> totalDataList = [];
 
+  int totalPrice = 0;
+  List<String> totalAmount = [];
   String registerName = "-";
-  DateTime date = DateTime.now();
+  String date = "";
+  int total = 0;
+  List<int> listInt = [];
 
   @override
   void initState() {
     super.initState();
     dataList.clear();
     dataList = widget.dataList!;
-    info();
   }
 
   info() async {
+    totalDataList.clear();
     var info = await customerProfileDatabase.fetchProfileAll();
-    setState(() {
-      for (var i = 0; i < info.length; i++) {
-        registerName = info[i].registerNumber.toString();
-        date = DateFormat('dd/MM/yyyy')
-            .format(DateTime.parse(info[i].date.toString())) as DateTime;
-      }
-    });
+
+    for (var i = 0; i < info.length; i++) {
+      registerName = info[i].registerNumber.toString();
+      date = DateFormat('dd/MM/yyyy')
+          .format(DateTime.parse(info[i].date.toString()));
+    }
+
+    for (var i = 0; i < dataList.length; i++) {
+      listInt.add(0);
+      selectedItemValue.add("1");
+
+      listInt[i] = dataList[i].partPrice! * int.parse(selectedItemValue[i]);
+
+      total = listInt.reduce((value, element) => value + element);
+
+      totalDataList.add(SparePart(
+          id: dataList[i].id,
+          partName: dataList[i].partName,
+          partPrice: listInt[i],
+          partQuantity: int.parse(selectedItemValue[i]),
+          bikeModelNo: dataList[i].bikeModelNo));
+    }
   }
 
   @override
@@ -61,20 +81,18 @@ class _ProductInvoiceScreenState extends State<ProductInvoiceScreen> {
             fontSize: 15,
             color: Colors.black,
           )),
-      body: Column(
-        children: <Widget>[
-          if (widget.dataList == null || widget.dataList!.isEmpty)
-            const Expanded(
-              child: Center(
+      body: FutureBuilder(
+          future: info(),
+          builder: (context, snapshot) {
+            if (widget.dataList == null || widget.dataList!.isEmpty) {
+              return Center(
                   child: TextBuilder(
                 fontSize: 15,
                 text: 'No item selected',
                 color: Colors.black,
-              )),
-            )
-          else
-            Expanded(
-              child: Column(
+              ));
+            } else {
+              return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
@@ -113,8 +131,7 @@ class _ProductInvoiceScreenState extends State<ProductInvoiceScreen> {
                               width: 13,
                             ),
                             TextBuilder(
-                                text:
-                                    "${date.day.toString()}/${date.month.toString()}/${date.year.toString()}",
+                                text: date,
                                 fontSize: 11.0,
                                 color: Colors.blueGrey,
                                 fontWeight: FontWeight.w500),
@@ -139,13 +156,13 @@ class _ProductInvoiceScreenState extends State<ProductInvoiceScreen> {
                         shrinkWrap: true,
                         itemCount: dataList.length,
                         itemBuilder: (BuildContext context, int index) {
-                          for (int i = 0; i < dataList.length; i++) {
-                            selectedItemValue.add("1");
-                          }
                           int price = 0;
-
                           price = dataList[index].partPrice! *
                               int.parse(selectedItemValue[index]);
+                          listInt[index] = price;
+
+                          total = listInt
+                              .reduce((value, element) => value + element);
 
                           return Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -212,30 +229,53 @@ class _ProductInvoiceScreenState extends State<ProductInvoiceScreen> {
                     ),
                   ),
                   const SizedBox(
-                    height: 15,
+                    height: 20,
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      TextBuilder(
-                        color: Colors.black,
-                        text: "Labour Charges",
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Image.asset(
+                            'assets/mechanic.png',
+                            height: 25,
+                          ),
+                          SizedBox(
+                            width: 5,
+                          ),
+                          TextBuilder(
+                            text: "Labour Charges",
+                            fontSize: 15,
+                          )
+                        ],
                       ),
                       SizedBox(
-                          height: 30,
-                          width: 100,
-                          child: CustomTextField(
-                            controller: labourCharge,
-                            textInputType: TextInputType.number,
-                          ))
+                        height: 25,
+                        width: 120,
+                        child: CustomTextField(
+                          controller: labourCharge,
+                          textInputType: TextInputType.number,
+                        ),
+                      ),
                     ],
                   ),
                   SizedBox(
-                    height: 15,
+                    height: 20,
                   ),
                   ButtonIcon(
                     onTap: () {
-                      Get.to(BillingScreen());
+                      if (labourCharge.text.isEmpty) {
+                        Utils.showToast(
+                            "please insert labour charges", Colors.red);
+                      } else {
+                        Get.to(BillingScreen(
+                            total: total,
+                            labourCharges: labourCharge.text,
+                            totalDataList: totalDataList));
+                      }
                     },
                     title: "NEXT",
                   ),
@@ -243,10 +283,9 @@ class _ProductInvoiceScreenState extends State<ProductInvoiceScreen> {
                     height: 15,
                   )
                 ],
-              ),
-            ),
-        ],
-      ),
+              );
+            }
+          }),
     );
   }
 }

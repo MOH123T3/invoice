@@ -1,21 +1,25 @@
 import 'package:autorepair/imports.dart';
 import 'package:autorepair/view/add_products/spare_part_list.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:autorepair/view/add_products/add_product.dart';
 
 class MainView extends StatefulWidget {
   final int initRoute;
-
-  const MainView({Key? key, required this.initRoute}) : super(key: key);
+  const MainView({super.key, required this.initRoute});
   @override
-  // ignore: library_private_types_in_public_api
   _MainViewState createState() => _MainViewState();
 }
 
 class _MainViewState extends State<MainView> {
   int _currentIndex = 0;
 
-  List<Widget> tabs = const [Home(), Transaction(), Payment(), Settings()];
+  List<Widget> tabs = const [
+    Home(),
+    Transaction(),
+    SubSparePartList(),
+    Settings()
+  ];
 
   var items = ["Add Products", "View All Orders"];
 
@@ -38,7 +42,9 @@ class _MainViewState extends State<MainView> {
               ? 'Home'
               : _currentIndex == 1
                   ? "Transaction History"
-                  : "",
+                  : _currentIndex == 2
+                      ? "Product List"
+                      : "",
           color: Colors.black,
         ),
       ),
@@ -57,9 +63,10 @@ class _MainViewState extends State<MainView> {
         currentIndex: _currentIndex,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.toc), label: 'Transaction'),
           BottomNavigationBarItem(
-              icon: Icon(Icons.account_balance), label: 'Payment'),
+              icon: FaIcon(FontAwesomeIcons.t), label: 'Transaction'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.list_rounded), label: 'Products'),
           BottomNavigationBarItem(
               icon: Icon(Icons.settings), label: 'Settings'),
         ],

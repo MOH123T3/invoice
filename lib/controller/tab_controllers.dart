@@ -4,7 +4,7 @@ class TabControllers {
   final drawer = [
     TabModel('Home', Icons.home),
     TabModel('Transaction', Icons.receipt_long),
-    TabModel('Payment', Icons.account_balance),
+    TabModel('Products', Icons.account_balance),
     TabModel('Settings', Icons.settings),
   ];
 }

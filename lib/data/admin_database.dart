@@ -5,56 +5,51 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:meta/meta.dart';
 
-class CustomerProfileDatabase {
+class AdminDatabase {
   @required
   final int? id;
   @required
-  final String? customerName;
+  final String? adminName;
   @required
-  final String? bikeModel;
+  final String? businessName;
   @required
   final int? mobileNumber;
   @required
-  final String? registerNumber;
-  @required
-  final String? date;
+  final String? businessAddress;
 
-  CustomerProfileDatabase(
+  AdminDatabase(
       {this.id,
-      this.customerName,
-      this.bikeModel,
+      this.adminName,
+      this.businessName,
       this.mobileNumber,
-      this.registerNumber,
-      this.date});
+      this.businessAddress});
 
-  CustomerProfileDatabase.fromDb(Map<String, dynamic> map)
+  AdminDatabase.fromDb(Map<String, dynamic> map)
       : id = map['id'],
-        customerName = map['customer_name'],
-        bikeModel = map['bike_model'],
+        adminName = map['admin_name'],
+        businessName = map['business_name'],
         mobileNumber = map['mobile_number'],
-        registerNumber = map['register_number'],
-        date = map['date'];
+        businessAddress = map['business_address'];
 
   Map<String, dynamic> toMapForDb() {
     var map = Map<String, dynamic>();
     map['id'] = id;
-    map['customer_name'] = customerName;
-    map['bike_model'] = bikeModel;
+    map['admin_name'] = adminName;
+    map['business_name'] = businessName;
     map['mobile_number'] = mobileNumber;
-    map['register_number'] = registerNumber;
-    map['date'] = date;
+    map['business_address'] = businessAddress;
 
     return map;
   }
 }
 
-class CustomerProDatabase {
-  static final CustomerProDatabase _instance = CustomerProDatabase._();
+class AdminProfileDatabase {
+  static final AdminProfileDatabase _instance = AdminProfileDatabase._();
   static Database? _database;
 
-  CustomerProDatabase._();
+  AdminProfileDatabase._();
 
-  factory CustomerProDatabase() {
+  factory AdminProfileDatabase() {
     return _instance;
   }
 
@@ -70,7 +65,7 @@ class CustomerProDatabase {
 
   Future<Database> init() async {
     Directory directory = await getApplicationDocumentsDirectory();
-    String dbPath = join(directory.path, 'profile_database.db');
+    String dbPath = join(directory.path, 'a_database.db');
 
     var database = openDatabase(dbPath,
         version: 1, onCreate: _onCreate, onUpgrade: _onUpgrade);
@@ -80,13 +75,12 @@ class CustomerProDatabase {
 
   void _onCreate(Database db, int version) {
     db.execute('''
-      CREATE TABLE customer_profile(
+      CREATE TABLE admin_profile(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        customer_name TEXT,
-        bike_model TEXT,
+        admin_name TEXT,
+        business_name TEXT,
         mobile_number INTEGER,
-        register_number TEXT,
-        date TEXT)
+        business_address TEXT)
     ''');
     print("Database was created!");
   }
@@ -95,42 +89,41 @@ class CustomerProDatabase {
     // Run migration according database versions
   }
 
-  Future<int> addData(CustomerProfileDatabase product) async {
+  Future<int> addData(AdminDatabase product) async {
     var client = await db;
 
-    return client.insert('customer_profile', product.toMapForDb(),
+    return client.insert('admin_profile', product.toMapForDb(),
         conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
-  Future<CustomerProfileDatabase> fetchData(int id) async {
+  Future<AdminDatabase> fetchData(int id) async {
     var client = await db;
     final Future<List<Map<String, dynamic>>> futureMaps =
-        client.query('customer_profile', where: 'id = ?', whereArgs: [id]);
+        client.query('admin_profile', where: 'id = ?', whereArgs: [id]);
     var maps = await futureMaps;
 
     if (maps.length != 0) {
-      return CustomerProfileDatabase.fromDb(maps.first);
+      return AdminDatabase.fromDb(maps.first);
     }
 
     return null!;
   }
 
-  Future<List<CustomerProfileDatabase>> fetchProfileAll() async {
+  Future<List<AdminDatabase>> fetchProfileAll() async {
     var client = await db;
-    var res = await client.query('customer_profile');
+    var res = await client.query('admin_profile');
 
     if (res.isNotEmpty) {
-      var products = res
-          .map((productsMap) => CustomerProfileDatabase.fromDb(productsMap))
-          .toList();
+      var products =
+          res.map((productsMap) => AdminDatabase.fromDb(productsMap)).toList();
       return products;
     }
     return [];
   }
 
-  Future<int> update(CustomerProfileDatabase newProduct) async {
+  Future<int> update(AdminDatabase newProduct) async {
     var client = await db;
-    return client.update('customer_profile', newProduct.toMapForDb(),
+    return client.update('admin_profile', newProduct.toMapForDb(),
         where: 'id = ?',
         whereArgs: [newProduct.id],
         conflictAlgorithm: ConflictAlgorithm.replace);
@@ -138,7 +131,7 @@ class CustomerProDatabase {
 
   Future<Future<int>> remove(int id) async {
     var client = await db;
-    return client.delete('customer_profile', where: 'id = ?', whereArgs: [id]);
+    return client.delete('admin_profile', where: 'id = ?', whereArgs: [id]);
   }
 
   Future closeDb() async {

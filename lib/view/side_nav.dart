@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
+import 'package:autorepair/data/admin_database.dart';
 import 'package:autorepair/imports.dart';
 
 class SideNav extends StatefulWidget {
@@ -12,6 +13,29 @@ class SideNav extends StatefulWidget {
 
 class _SideNavState extends State<SideNav> {
   final drawer = TabControllers();
+  final db = AdminProfileDatabase();
+
+  String adminName = "";
+  String mobileNumber = "";
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    adminInfo();
+  }
+
+  adminInfo() async {
+    var info = await db.fetchProfileAll();
+
+    for (var i = 0; i < info.length; i++) {
+      adminName = info[i].adminName.toString();
+      mobileNumber = info[i].mobileNumber.toString();
+    }
+
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -56,12 +80,12 @@ class _SideNavState extends State<SideNav> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             TextBuilder(
-                              text: 'Mohit Panchal',
+                              text: adminName,
                               textAlign: TextAlign.start,
                               fontSize: 10,
                             ),
                             TextBuilder(
-                              text: '+91 8003478***',
+                              text: mobileNumber,
                               textAlign: TextAlign.start,
                               fontSize: 8,
                             ),
@@ -100,6 +124,7 @@ class _SideNavState extends State<SideNav> {
                 ),
                 ListTile(
                   onTap: () {
+                    db.closeDb();
                     Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(builder: (_) => const Splash()),

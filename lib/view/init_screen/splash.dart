@@ -1,3 +1,4 @@
+import 'package:autorepair/data/admin_database.dart';
 import 'package:autorepair/imports.dart';
 
 class Splash extends StatefulWidget {
@@ -10,24 +11,46 @@ class Splash extends StatefulWidget {
 }
 
 class SplashState extends State<Splash> {
+  final db = AdminProfileDatabase();
+
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 2), () {
-      Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => const MainView(initRoute: 0)),
-          (route) => false);
-    });
+
+    navigate();
+  }
+
+  navigate() async {
+    var alreadyLogin = await db.fetchProfileAll();
+
+    print('alreadyLogin.isEmpty  - ${alreadyLogin.isEmpty}');
+    if (alreadyLogin.isEmpty) {
+      Future.delayed(const Duration(seconds: 2), () {
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const RegisterPage()),
+            (route) => false);
+      });
+    } else {
+      Future.delayed(const Duration(seconds: 2), () {
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+                builder: (context) => const MainView(initRoute: 0)),
+            (route) => false);
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       backgroundColor: Color(0xFFFFFFFF),
       body: Center(
-        child: FlutterLogo(size: 200),
-      ),
+          child: Image.asset(
+        'assets/mechanic.png',
+        height: 200,
+      )),
     );
   }
 }

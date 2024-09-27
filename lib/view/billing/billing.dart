@@ -1,28 +1,39 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, must_be_immutable
 
+import 'package:autorepair/data/billing_database.dart';
 import 'package:autorepair/data/customer_profile_database.dart';
+import 'package:autorepair/data/product_database.dart';
+import 'package:autorepair/data/selected_billing_product_database.dart';
 import 'package:autorepair/utils/app_colors.dart';
+import 'package:autorepair/utils/dialog.dart';
 import 'package:autorepair/widgets/text/text_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../widgets/icon_button/fab_cta.dart';
 
 class BillingScreen extends StatefulWidget {
-  const BillingScreen({super.key});
+  int? total;
+  String? labourCharges;
+  List<SparePart>? totalDataList;
+  BillingScreen(
+      {super.key, this.total, this.labourCharges, this.totalDataList});
 
   @override
   State<BillingScreen> createState() => _BillingScreenState();
 }
 
 class _BillingScreenState extends State<BillingScreen> {
-  var customerProfileDatabase = CustomerProfileDatabaseDatabase();
-  DateTime date = DateTime.now();
+  var customerProfileDatabase = CustomerProDatabase();
+  var detailBillingDatabase = DetailBillingDatabase();
+  var selectedBillingProductDatabase = BillingProductDatabaseDatabase();
+
+  String? date;
   String registerName = "-";
   String yourName = "-";
   String yourMobileNumber = "-";
   String id = "-";
   String model = "-";
-
+  List<SparePart> totalDataList = <SparePart>[];
+  int grandTotal = 0;
   @override
   void initState() {
     // TODO: implement initState
@@ -31,17 +42,22 @@ class _BillingScreenState extends State<BillingScreen> {
   }
 
   info() async {
+    totalDataList.clear();
     var info = await customerProfileDatabase.fetchProfileAll();
     setState(() {
       for (var i = 0; i < info.length; i++) {
         date = DateFormat('dd/MM/yyyy')
-            .format(DateTime.parse(info[i].date.toString())) as DateTime;
+            .format(DateTime.parse(info[i].date.toString()));
         registerName = info[i].registerNumber.toString();
         yourMobileNumber = info[i].mobileNumber.toString();
         yourName = info[i].customerName.toString();
         id = info[i].id.toString();
         model = info[i].bikeModel.toString();
       }
+
+      totalDataList = widget.totalDataList!;
+
+      grandTotal = widget.total! + int.parse(widget.labourCharges!);
     });
   }
 
@@ -56,8 +72,7 @@ class _BillingScreenState extends State<BillingScreen> {
             fontSize: 15,
             color: Colors.black,
           )),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      body: ListView(
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -75,8 +90,7 @@ class _BillingScreenState extends State<BillingScreen> {
                 const SizedBox(
                   height: 5,
                 ),
-                leadingText("Date :",
-                    "${date.day.toString()}/${date.month.toString()}/${date.year.toString()}"),
+                leadingText("Date :", date ?? ""),
                 const SizedBox(
                   height: 5,
                 ),
@@ -102,10 +116,29 @@ class _BillingScreenState extends State<BillingScreen> {
             ),
             child: Column(
               children: [
-                _header(),
+                Row(
+                  children: <Widget>[
+                    Expanded(
+                      flex: 1,
+                      child: headingTextData('Id'),
+                    ),
+                    Expanded(
+                      flex: 3,
+                      child: headingTextData('Product Name'),
+                    ),
+                    Expanded(
+                      flex: 2,
+                      child: headingTextData("Price"),
+                    ),
+                    Expanded(
+                      flex: 2,
+                      child: headingTextData('Quantity'),
+                    ),
+                  ],
+                ),
                 ListView.builder(
                   shrinkWrap: true,
-                  itemCount: 5,
+                  itemCount: totalDataList.length,
                   itemBuilder: (BuildContext context, int index) {
                     return Padding(
                       padding: EdgeInsets.only(bottom: 10, top: 10),
@@ -114,7 +147,7 @@ class _BillingScreenState extends State<BillingScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Expanded(
-                              flex: 2,
+                              flex: 1,
                               child: TextBuilder(
                                 textAlign: TextAlign.center,
                                 fontSize: 10,
@@ -125,28 +158,21 @@ class _BillingScreenState extends State<BillingScreen> {
                               child: TextBuilder(
                                 textAlign: TextAlign.center,
                                 fontSize: 10,
-                                text: 'Oil',
+                                text: "${totalDataList[index].partName}",
                               )),
                           Expanded(
                               flex: 2,
                               child: TextBuilder(
                                 textAlign: TextAlign.center,
                                 fontSize: 10,
-                                text: '400 Rs',
+                                text: '${totalDataList[index].partPrice}',
                               )),
                           Expanded(
                               flex: 2,
                               child: TextBuilder(
                                 textAlign: TextAlign.center,
                                 fontSize: 10,
-                                text: '1',
-                              )),
-                          Expanded(
-                              flex: 2,
-                              child: TextBuilder(
-                                textAlign: TextAlign.center,
-                                fontSize: 10,
-                                text: '400',
+                                text: '${totalDataList[index].partQuantity}',
                               )),
                         ],
                       ),
@@ -170,19 +196,23 @@ class _BillingScreenState extends State<BillingScreen> {
             ),
             child: Row(
               children: [
-                const Column(
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     TextBuilder(
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
-                      text: "Labour Charges : ",
+                      text:
+                          "Labour Charges :   ${widget.labourCharges ?? "0"} ",
+                    ),
+                    SizedBox(
+                      height: 5,
                     ),
                     TextBuilder(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
-                      text: "Grand Total : ",
+                      text: "Grand Total    :    $grandTotal",
                     ),
                   ],
                 ),
@@ -196,9 +226,102 @@ class _BillingScreenState extends State<BillingScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               InkWell(
-                onTap: () {},
+                onTap: () {
+                  ShowDialog.dialog(
+                      context,
+                      Container(
+                        padding: EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                            color: AppColors.dashColor[3],
+                            borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(15),
+                                topRight: Radius.circular(15))),
+                        child: Column(
+                          children: [
+                            TextBuilder(
+                              text: 'Payment here',
+                            ),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 10),
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.qr_code_2_outlined,
+                              size: 100,
+                            ),
+                            SizedBox(
+                              height: 15,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                TextBuilder(
+                                  fontSize: 12,
+                                  text: "Payable Amount",
+                                ),
+                                TextBuilder(text: grandTotal.toString()),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                TextBuilder(
+                                  fontSize: 12,
+                                  text: "Due Amount",
+                                ),
+                                TextBuilder(text: grandTotal.toString()),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                TextBuilder(
+                                  fontSize: 12,
+                                  text: "Payment Type",
+                                ),
+                                TextBuilder(text: grandTotal.toString()),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 15,
+                            ),
+                            InkWell(
+                              onTap: () {
+                                Navigator.pop(context);
+                              },
+                              child: Container(
+                                height: 35,
+                                width: 130,
+                                alignment: Alignment.center,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 5),
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20),
+                                    color: AppColors.dashColor[3]),
+                                child: TextBuilder(
+                                  text: "Done",
+                                  textOverflow: TextOverflow.clip,
+                                  fontSize: 12.0,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ));
+                },
                 child: Container(
-                    height: 30,
+                    height: 35,
                     width: 130,
                     alignment: Alignment.center,
                     padding:
@@ -225,24 +348,24 @@ class _BillingScreenState extends State<BillingScreen> {
               InkWell(
                 onTap: () {},
                 child: Container(
-                    height: 30,
+                    height: 35,
                     width: 130,
                     alignment: Alignment.center,
                     padding:
                         const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20),
-                        color: AppColors.dashColor[5]),
+                        color: AppColors.dashColor[1]),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        Image.asset(
-                          'assets/qr_code.png',
-                          height: 25,
+                        Icon(
+                          Icons.picture_as_pdf,
+                          size: 25,
                           color: Colors.yellow,
                         ),
                         const TextBuilder(
-                          text: "Qr Code",
+                          text: "Pdf Dow.",
                           textOverflow: TextOverflow.clip,
                           fontSize: 12.0,
                           color: Colors.white,
@@ -257,33 +380,6 @@ class _BillingScreenState extends State<BillingScreen> {
           )
         ],
       ),
-    );
-  }
-
-  _header() {
-    return Row(
-      children: <Widget>[
-        Expanded(
-          flex: 2,
-          child: headingTextData('Id'),
-        ),
-        Expanded(
-          flex: 3,
-          child: headingTextData('Product Name'),
-        ),
-        Expanded(
-          flex: 2,
-          child: headingTextData("Price"),
-        ),
-        Expanded(
-          flex: 2,
-          child: headingTextData('Quantity'),
-        ),
-        Expanded(
-          flex: 2,
-          child: headingTextData('Total'),
-        ),
-      ],
     );
   }
 
@@ -321,5 +417,17 @@ class _BillingScreenState extends State<BillingScreen> {
         ),
       ],
     );
+  }
+
+  setAmount() async {
+    var addDetails = BillingDatabase(
+      customerName: yourName,
+      date: date,
+      id: int.parse(id),
+      labourCharges: widget.labourCharges,
+      registerNumber: registerName,
+    );
+
+    await detailBillingDatabase.addData(addDetails);
   }
 }

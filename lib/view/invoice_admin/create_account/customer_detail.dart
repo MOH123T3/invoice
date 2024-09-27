@@ -13,7 +13,7 @@ class CreateInvoiceTemplate extends StatefulWidget {
 }
 
 class _CreateInvoiceTemplateState extends State<CreateInvoiceTemplate> {
-  final db = CustomerProfileDatabaseDatabase();
+  final db = CustomerProDatabase();
 
   final SharedPreferencesAsync asyncPrefs = SharedPreferencesAsync();
 

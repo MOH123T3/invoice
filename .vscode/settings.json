@@ -3,6 +3,7 @@
         "ARGB",
         "AUTOINCREMENT",
         "autorepair",
-        "Prefs"
+        "Prefs",
+        "sqflite"
     ]
 }
