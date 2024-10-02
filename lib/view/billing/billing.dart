@@ -4,36 +4,43 @@ import 'package:autorepair/data/billing_database.dart';
 import 'package:autorepair/data/customer_profile_database.dart';
 import 'package:autorepair/data/product_database.dart';
 import 'package:autorepair/data/selected_billing_product_database.dart';
-import 'package:autorepair/utils/app_colors.dart';
+import 'package:autorepair/imports.dart';
 import 'package:autorepair/utils/dialog.dart';
-import 'package:autorepair/widgets/text/text_builder.dart';
-import 'package:flutter/material.dart';
+import 'package:autorepair/utils/utils.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 class BillingScreen extends StatefulWidget {
   int? total;
   String? labourCharges;
   List<SparePart>? totalDataList;
+  CustomerProfile? customerProfileData;
+
   BillingScreen(
-      {super.key, this.total, this.labourCharges, this.totalDataList});
+      {super.key,
+      this.total,
+      this.labourCharges,
+      this.totalDataList,
+      this.customerProfileData});
 
   @override
   State<BillingScreen> createState() => _BillingScreenState();
 }
 
 class _BillingScreenState extends State<BillingScreen> {
-  var customerProfileDatabase = CustomerProDatabase();
-  var detailBillingDatabase = DetailBillingDatabase();
+  var finalBillingDatabase = FinalBillingDatabase();
   var selectedBillingProductDatabase = BillingProductDatabaseDatabase();
+  TextEditingController dueAmountController = TextEditingController();
 
   String? date;
   String registerName = "-";
   String yourName = "-";
   String yourMobileNumber = "-";
-  String id = "-";
   String model = "-";
   List<SparePart> totalDataList = <SparePart>[];
   int grandTotal = 0;
+  int finalAmount = 0;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -43,20 +50,14 @@ class _BillingScreenState extends State<BillingScreen> {
 
   info() async {
     totalDataList.clear();
-    var info = await customerProfileDatabase.fetchProfileAll();
     setState(() {
-      for (var i = 0; i < info.length; i++) {
-        date = DateFormat('dd/MM/yyyy')
-            .format(DateTime.parse(info[i].date.toString()));
-        registerName = info[i].registerNumber.toString();
-        yourMobileNumber = info[i].mobileNumber.toString();
-        yourName = info[i].customerName.toString();
-        id = info[i].id.toString();
-        model = info[i].bikeModel.toString();
-      }
-
+      date = DateFormat('dd/MM/yyyy')
+          .format(DateTime.parse(widget.customerProfileData!.date.toString()));
+      registerName = widget.customerProfileData!.registerNumber.toString();
+      yourMobileNumber = widget.customerProfileData!.mobileNumber.toString();
+      yourName = widget.customerProfileData!.customerName.toString();
+      model = widget.customerProfileData!.bikeModel.toString();
       totalDataList = widget.totalDataList!;
-
       grandTotal = widget.total! + int.parse(widget.labourCharges!);
     });
   }
@@ -78,10 +79,6 @@ class _BillingScreenState extends State<BillingScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               children: [
-                leadingText("Invoice Id :", id),
-                const SizedBox(
-                  height: 5,
-                ),
                 leadingText("Name :", yourName),
                 const SizedBox(
                   height: 5,
@@ -239,7 +236,7 @@ class _BillingScreenState extends State<BillingScreen> {
                         child: Column(
                           children: [
                             TextBuilder(
-                              text: 'Payment here',
+                              text: 'Total Rs $grandTotal',
                             ),
                           ],
                         ),
@@ -261,43 +258,42 @@ class _BillingScreenState extends State<BillingScreen> {
                               children: [
                                 TextBuilder(
                                   fontSize: 12,
-                                  text: "Payable Amount",
+                                  text: "Paid Amount",
                                 ),
-                                TextBuilder(text: grandTotal.toString()),
+                                SizedBox(
+                                    height: 25,
+                                    width: 70,
+                                    child: CustomTextField(
+                                      onChanged: (value) {
+                                        finalAmount =
+                                            grandTotal - int.parse(value);
+                                      },
+                                      controller: dueAmountController,
+                                      textInputType: TextInputType.number,
+                                    )),
                               ],
                             ),
                             SizedBox(
                               height: 10,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                TextBuilder(
-                                  fontSize: 12,
-                                  text: "Due Amount",
-                                ),
-                                TextBuilder(text: grandTotal.toString()),
-                              ],
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                TextBuilder(
-                                  fontSize: 12,
-                                  text: "Payment Type",
-                                ),
-                                TextBuilder(text: grandTotal.toString()),
-                              ],
-                            ),
-                            SizedBox(
-                              height: 15,
                             ),
                             InkWell(
                               onTap: () {
-                                Navigator.pop(context);
+                                if (dueAmountController.text.isEmpty) {
+                                  Utils.showToast(
+                                      'Please insert amount', Colors.red);
+                                } else {
+                                  if (int.parse(dueAmountController.text) >
+                                      grandTotal) {
+                                    Utils.showToast(
+                                        'Please insert valid amount',
+                                        Colors.red);
+                                    dueAmountController.clear();
+                                  } else {
+                                    Utils.showToast(
+                                        'Due $finalAmount', Colors.green);
+                                    payedSuccessfully();
+                                  }
+                                }
                               },
                               child: Container(
                                 height: 35,
@@ -345,39 +341,8 @@ class _BillingScreenState extends State<BillingScreen> {
                       ],
                     )),
               ),
-              InkWell(
-                onTap: () {},
-                child: Container(
-                    height: 35,
-                    width: 130,
-                    alignment: Alignment.center,
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: AppColors.dashColor[1]),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Icon(
-                          Icons.picture_as_pdf,
-                          size: 25,
-                          color: Colors.yellow,
-                        ),
-                        const TextBuilder(
-                          text: "Pdf Dow.",
-                          textOverflow: TextOverflow.clip,
-                          fontSize: 12.0,
-                          color: Colors.white,
-                        ),
-                      ],
-                    )),
-              ),
             ],
           ),
-          const SizedBox(
-            height: 15,
-          )
         ],
       ),
     );
@@ -419,15 +384,20 @@ class _BillingScreenState extends State<BillingScreen> {
     );
   }
 
-  setAmount() async {
+  payedSuccessfully() async {
     var addDetails = BillingDatabase(
-      customerName: yourName,
-      date: date,
-      id: int.parse(id),
-      labourCharges: widget.labourCharges,
-      registerNumber: registerName,
-    );
+        customerName: yourName,
+        date: date,
+        labourCharges: widget.labourCharges,
+        registerNumber: registerName,
+        totalAmount: grandTotal.toString(),
+        paidAmount: dueAmountController.text,
+        dueAmount: finalAmount.toString(),
+        paymentType: 'cash',
+        mobileNumber: yourMobileNumber);
 
-    await detailBillingDatabase.addData(addDetails);
+    await finalBillingDatabase.addData(addDetails);
+
+    Get.to(MainView(initRoute: 1));
   }
 }

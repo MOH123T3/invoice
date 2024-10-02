@@ -10,4 +10,13 @@ class Utils {
         backgroundColor: backgroundColor,
         textColor: Colors.white);
   }
+
+  static noData() {
+    return Center(
+      child: Image.asset(
+        'assets/file.png',
+        height: 50,
+      ),
+    );
+  }
 }

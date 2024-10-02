@@ -19,8 +19,6 @@ export 'package:autorepair/controller/tab_controllers.dart';
 export 'package:autorepair/view/init_screen/register/register_page.dart';
 export 'package:autorepair/controller/dashboard_controller.dart';
 export 'package:autorepair/widgets/cards/stats_card_tile.dart';
-export 'package:autorepair/controller/invoice_controller.dart';
-export 'package:autorepair/model/invoice_model.dart';
 export 'package:autorepair/widgets/cards/invoice_card_tile.dart';
 export 'package:autorepair/widgets/text_filed/custom_text_filed.dart';
 export 'package:autorepair/widgets/icon_button/fab_cta.dart';

@@ -11,8 +11,9 @@ import 'package:intl/intl.dart';
 
 class ProductInvoiceScreen extends StatefulWidget {
   List<SparePart>? dataList;
+  CustomerProfile? customerProfileData;
 
-  ProductInvoiceScreen({super.key, this.dataList});
+  ProductInvoiceScreen({super.key, this.dataList, this.customerProfileData});
 
   @override
   State<ProductInvoiceScreen> createState() => _ProductInvoiceScreenState();
@@ -22,7 +23,6 @@ class _ProductInvoiceScreenState extends State<ProductInvoiceScreen> {
   final part = PartController();
   var items = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
 
-  var customerProfileDatabase = CustomerProDatabase();
   TextEditingController labourCharge = TextEditingController();
 
   List<String> selectedItemValue = <String>[];
@@ -30,7 +30,6 @@ class _ProductInvoiceScreenState extends State<ProductInvoiceScreen> {
   List<SparePart> totalDataList = [];
 
   int totalPrice = 0;
-  List<String> totalAmount = [];
   String registerName = "-";
   String date = "";
   int total = 0;
@@ -45,13 +44,10 @@ class _ProductInvoiceScreenState extends State<ProductInvoiceScreen> {
 
   info() async {
     totalDataList.clear();
-    var info = await customerProfileDatabase.fetchProfileAll();
 
-    for (var i = 0; i < info.length; i++) {
-      registerName = info[i].registerNumber.toString();
-      date = DateFormat('dd/MM/yyyy')
-          .format(DateTime.parse(info[i].date.toString()));
-    }
+    registerName = widget.customerProfileData!.registerNumber.toString();
+    date = DateFormat('dd/MM/yyyy')
+        .format(DateTime.parse(widget.customerProfileData!.date.toString()));
 
     for (var i = 0; i < dataList.length; i++) {
       listInt.add(0);
@@ -157,12 +153,16 @@ class _ProductInvoiceScreenState extends State<ProductInvoiceScreen> {
                         itemCount: dataList.length,
                         itemBuilder: (BuildContext context, int index) {
                           int price = 0;
-                          price = dataList[index].partPrice! *
-                              int.parse(selectedItemValue[index]);
-                          listInt[index] = price;
+                          try {
+                            price = dataList[index].partPrice! *
+                                int.parse(selectedItemValue[index]);
+                            listInt[index] = price;
 
-                          total = listInt
-                              .reduce((value, element) => value + element);
+                            total = listInt
+                                .reduce((value, element) => value + element);
+                          } catch (e) {
+                            e.toString();
+                          }
 
                           return Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -272,6 +272,7 @@ class _ProductInvoiceScreenState extends State<ProductInvoiceScreen> {
                             "please insert labour charges", Colors.red);
                       } else {
                         Get.to(BillingScreen(
+                            customerProfileData: widget.customerProfileData,
                             total: total,
                             labourCharges: labourCharge.text,
                             totalDataList: totalDataList));

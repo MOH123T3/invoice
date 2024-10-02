@@ -25,6 +25,8 @@ class BillingDatabase {
   final String? dueAmount;
   @required
   final String? paidAmount;
+  @required
+  final String? mobileNumber;
   BillingDatabase(
       {this.id,
       this.customerName,
@@ -34,7 +36,8 @@ class BillingDatabase {
       this.totalAmount,
       this.labourCharges,
       this.dueAmount,
-      this.paidAmount});
+      this.paidAmount,
+      this.mobileNumber});
 
   BillingDatabase.fromDb(Map<String, dynamic> map)
       : id = map['id'],
@@ -45,7 +48,8 @@ class BillingDatabase {
         totalAmount = map['total_amount'],
         labourCharges = map['labour_charge'],
         dueAmount = map['due_amount'],
-        paidAmount = map['paid_amount'];
+        paidAmount = map['paid_amount'],
+        mobileNumber = map['mobile_number'];
 
   Map<String, dynamic> toMapForDb() {
     var map = Map<String, dynamic>();
@@ -58,18 +62,19 @@ class BillingDatabase {
     map['labour_charge'] = labourCharges;
     map['due_amount'] = dueAmount;
     map['paid_amount'] = paidAmount;
+    map['mobile_number'] = mobileNumber;
 
     return map;
   }
 }
 
-class DetailBillingDatabase {
-  static final DetailBillingDatabase _instance = DetailBillingDatabase._();
+class FinalBillingDatabase {
+  static final FinalBillingDatabase _instance = FinalBillingDatabase._();
   static Database? _database;
 
-  DetailBillingDatabase._();
+  FinalBillingDatabase._();
 
-  factory DetailBillingDatabase() {
+  factory FinalBillingDatabase() {
     return _instance;
   }
 
@@ -103,7 +108,9 @@ class DetailBillingDatabase {
         date TEXT,total_amount TEXT,
         labour_charge TEXT,
         due_amount TEXT,
-        paid_amount TEXT)
+        paid_amount TEXT,
+        mobile_number TEXT
+        )
     ''');
     print("Database was created!");
   }

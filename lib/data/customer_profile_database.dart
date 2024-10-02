@@ -1,11 +1,6 @@
-import 'dart:async';
-import 'dart:io';
-import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:meta/meta.dart';
 
-class CustomerProfileDatabase {
+class CustomerProfile {
   @required
   final int? id;
   @required
@@ -19,7 +14,7 @@ class CustomerProfileDatabase {
   @required
   final String? date;
 
-  CustomerProfileDatabase(
+  CustomerProfile(
       {this.id,
       this.customerName,
       this.bikeModel,
@@ -27,7 +22,7 @@ class CustomerProfileDatabase {
       this.registerNumber,
       this.date});
 
-  CustomerProfileDatabase.fromDb(Map<String, dynamic> map)
+  CustomerProfile.fromDb(Map<String, dynamic> map)
       : id = map['id'],
         customerName = map['customer_name'],
         bikeModel = map['bike_model'],
@@ -48,101 +43,101 @@ class CustomerProfileDatabase {
   }
 }
 
-class CustomerProDatabase {
-  static final CustomerProDatabase _instance = CustomerProDatabase._();
-  static Database? _database;
+// class CustomerProDatabase {
+//   static final CustomerProDatabase _instance = CustomerProDatabase._();
+//   static Database? _database;
 
-  CustomerProDatabase._();
+//   CustomerProDatabase._();
 
-  factory CustomerProDatabase() {
-    return _instance;
-  }
+//   factory CustomerProDatabase() {
+//     return _instance;
+//   }
 
-  Future<Database> get db async {
-    if (_database != null) {
-      return _database!;
-    }
+//   Future<Database> get db async {
+//     if (_database != null) {
+//       return _database!;
+//     }
 
-    _database = await init();
+//     _database = await init();
 
-    return _database!;
-  }
+//     return _database!;
+//   }
 
-  Future<Database> init() async {
-    Directory directory = await getApplicationDocumentsDirectory();
-    String dbPath = join(directory.path, 'profile_database.db');
+//   Future<Database> init() async {
+//     Directory directory = await getApplicationDocumentsDirectory();
+//     String dbPath = join(directory.path, 'profile_database.db');
 
-    var database = openDatabase(dbPath,
-        version: 1, onCreate: _onCreate, onUpgrade: _onUpgrade);
+//     var database = openDatabase(dbPath,
+//         version: 1, onCreate: _onCreate, onUpgrade: _onUpgrade);
 
-    return database;
-  }
+//     return database;
+//   }
 
-  void _onCreate(Database db, int version) {
-    db.execute('''
-      CREATE TABLE customer_profile(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        customer_name TEXT,
-        bike_model TEXT,
-        mobile_number INTEGER,
-        register_number TEXT,
-        date TEXT)
-    ''');
-    print("Database was created!");
-  }
+//   void _onCreate(Database db, int version) {
+//     db.execute('''
+//       CREATE TABLE customer_profile(
+//         id INTEGER PRIMARY KEY AUTOINCREMENT,
+//         customer_name TEXT,
+//         bike_model TEXT,
+//         mobile_number INTEGER,
+//         register_number TEXT,
+//         date TEXT)
+//     ''');
+//     print("Database was created!");
+//   }
 
-  void _onUpgrade(Database db, int oldVersion, int newVersion) {
-    // Run migration according database versions
-  }
+//   void _onUpgrade(Database db, int oldVersion, int newVersion) {
+//     // Run migration according database versions
+//   }
 
-  Future<int> addData(CustomerProfileDatabase product) async {
-    var client = await db;
+//   Future<int> addData(CustomerProfile product) async {
+//     var client = await db;
 
-    return client.insert('customer_profile', product.toMapForDb(),
-        conflictAlgorithm: ConflictAlgorithm.replace);
-  }
+//     return client.insert('customer_profile', product.toMapForDb(),
+//         conflictAlgorithm: ConflictAlgorithm.replace);
+//   }
 
-  Future<CustomerProfileDatabase> fetchData(int id) async {
-    var client = await db;
-    final Future<List<Map<String, dynamic>>> futureMaps =
-        client.query('customer_profile', where: 'id = ?', whereArgs: [id]);
-    var maps = await futureMaps;
+//   Future<CustomerProfile> fetchData(int id) async {
+//     var client = await db;
+//     final Future<List<Map<String, dynamic>>> futureMaps =
+//         client.query('customer_profile', where: 'id = ?', whereArgs: [id]);
+//     var maps = await futureMaps;
 
-    if (maps.length != 0) {
-      return CustomerProfileDatabase.fromDb(maps.first);
-    }
+//     if (maps.length != 0) {
+//       return CustomerProfile.fromDb(maps.first);
+//     }
 
-    return null!;
-  }
+//     return null!;
+//   }
 
-  Future<List<CustomerProfileDatabase>> fetchProfileAll() async {
-    var client = await db;
-    var res = await client.query('customer_profile');
+//   Future<List<CustomerProfile>> fetchProfileAll() async {
+//     var client = await db;
+//     var res = await client.query('customer_profile');
 
-    if (res.isNotEmpty) {
-      var products = res
-          .map((productsMap) => CustomerProfileDatabase.fromDb(productsMap))
-          .toList();
-      return products;
-    }
-    return [];
-  }
+//     if (res.isNotEmpty) {
+//       var products = res
+//           .map((productsMap) => CustomerProfile.fromDb(productsMap))
+//           .toList();
+//       return products;
+//     }
+//     return [];
+//   }
 
-  Future<int> update(CustomerProfileDatabase newProduct) async {
-    var client = await db;
-    return client.update('customer_profile', newProduct.toMapForDb(),
-        where: 'id = ?',
-        whereArgs: [newProduct.id],
-        conflictAlgorithm: ConflictAlgorithm.replace);
-  }
+//   Future<int> update(CustomerProfile newProduct) async {
+//     var client = await db;
+//     return client.update('customer_profile', newProduct.toMapForDb(),
+//         where: 'id = ?',
+//         whereArgs: [newProduct.id],
+//         conflictAlgorithm: ConflictAlgorithm.replace);
+//   }
 
-  Future<Future<int>> remove(int id) async {
-    var client = await db;
-    return client.delete('customer_profile', where: 'id = ?', whereArgs: [id]);
-  }
+//   Future<Future<int>> remove(int id) async {
+//     var client = await db;
+//     return client.delete('customer_profile', where: 'id = ?', whereArgs: [id]);
+//   }
 
-  Future closeDb() async {
-    var client = await db;
-    client.close();
-  }
-}
+//   Future closeDb() async {
+//     var client = await db;
+//     client.close();
+//   }
+// }

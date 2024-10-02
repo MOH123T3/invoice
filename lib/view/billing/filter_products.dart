@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors
 
+import 'package:autorepair/data/customer_profile_database.dart';
 import 'package:filter_list/filter_list.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -9,7 +10,9 @@ import 'package:autorepair/view/billing/product_invoice.dart';
 import 'package:autorepair/widgets/text/text_builder.dart';
 
 class FilterProductsScreen extends StatefulWidget {
-  const FilterProductsScreen({Key? key}) : super(key: key);
+  CustomerProfile? customerProfileData;
+
+  FilterProductsScreen({Key? key, this.customerProfileData}) : super(key: key);
 
   @override
   _FilterProductsScreenState createState() => _FilterProductsScreenState();
@@ -77,7 +80,10 @@ class _FilterProductsScreenState extends State<FilterProductsScreen> {
         listData: userList,
         selectedListData: selectedUserList,
         onApplyButtonClick: (list) {
-          Get.to(ProductInvoiceScreen(dataList: list));
+          Get.to(ProductInvoiceScreen(
+            dataList: list,
+            customerProfileData: widget.customerProfileData,
+          ));
         },
         choiceChipLabel: (item) {
           return item!.partName;

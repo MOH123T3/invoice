@@ -13,8 +13,6 @@ class CreateInvoiceTemplate extends StatefulWidget {
 }
 
 class _CreateInvoiceTemplateState extends State<CreateInvoiceTemplate> {
-  final db = CustomerProDatabase();
-
   final SharedPreferencesAsync asyncPrefs = SharedPreferencesAsync();
 
   TextEditingController customerNameTextEditingController =
@@ -122,31 +120,17 @@ class _CreateInvoiceTemplateState extends State<CreateInvoiceTemplate> {
 
   void save(context) async {
     try {
-      String? oldRegisterNumber = await asyncPrefs.getString('registerNumber');
+      var profile = CustomerProfile(
+          customerName: customerNameTextEditingController.text,
+          bikeModel: bikeModelTextEditingController.text,
+          date: DateTime.now().toString(),
+          mobileNumber:
+              int.parse(mobileNumberTextEditingController.text.toString()),
+          registerNumber: registerNumberTextEditingController.text.toString());
 
-      if (oldRegisterNumber == registerNumberTextEditingController.text) {
-        Navigator.pop(context);
-        Get.to(const FilterProductsScreen());
-      } else {
-        var profile = CustomerProfileDatabase(
-            customerName: customerNameTextEditingController.text,
-            bikeModel: bikeModelTextEditingController.text,
-            date: DateTime.now().toString(),
-            mobileNumber:
-                int.parse(mobileNumberTextEditingController.text.toString()),
-            registerNumber:
-                registerNumberTextEditingController.text.toString());
-
-        await db.addData(profile);
-
-        asyncPrefs.setString(
-            'registerNumber', registerNumberTextEditingController.text);
-
-        // asyncPrefs.setBool('isLogin', true);
-
-        Navigator.pop(context);
-        Get.to(const FilterProductsScreen());
-      }
+      Get.to(FilterProductsScreen(
+        customerProfileData: profile,
+      ));
     } catch (e) {
       e.toString();
     }

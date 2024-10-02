@@ -1,3 +1,4 @@
+import 'package:autorepair/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:autorepair/data/product_database.dart';
 import 'package:autorepair/widgets/text/text_builder.dart';
@@ -67,74 +68,82 @@ class _SubSparePartListState extends State<SubSparePartList> {
             SizedBox(
               height: 10,
             ),
-            Expanded(
-              child: FutureBuilder(
-                  future: setupList(),
-                  builder: (context, snapshot) {
-                    return ListView.builder(
-                      physics: AlwaysScrollableScrollPhysics(),
-                      itemCount: partList.length,
-                      shrinkWrap: true,
-                      itemBuilder: (BuildContext context, int index) {
-                        return Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: <Widget>[
-                            Expanded(
-                              flex: 1,
-                              child: textData(partList[index].id.toString()),
-                            ),
-                            Expanded(
-                              flex: 3,
-                              child:
-                                  textData(partList[index].partName.toString()),
-                            ),
-                            Expanded(
-                              flex: 2,
-                              child: textData(
-                                  "${partList[index].partPrice.toString()} Rs."),
-                            ),
-                            Expanded(
-                              flex: 2,
-                              child: textData(
-                                  partList[index].partQuantity.toString()),
-                            ),
-                            Expanded(
-                              flex: 2,
-                              child: textData(
-                                  partList[index].bikeModelNo.toString()),
-                            ),
-                            Expanded(
-                              flex: 2,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    color: Colors.red,
-                                    height: 30,
-                                    width: 100,
-                                    child: IconButton(
-                                      padding: EdgeInsets.zero,
-                                      icon: const Icon(
-                                        Icons.delete,
-                                        size: 20,
-                                        color: Colors.white,
-                                      ),
-                                      onPressed: () {
-                                        onDelete(partList[index].id!);
-                                      },
-                                    ),
-                                  ),
-                                  const Divider()
-                                ],
-                              ),
-                            )
-                          ],
-                        );
-                      },
+            FutureBuilder(
+                future: setupList(),
+                builder: (context, snapShots) {
+                  if (snapShots.connectionState == ConnectionState.waiting) {
+                    return Center(
+                      child: CircularProgressIndicator(),
                     );
-                  }),
-            ),
+                  } else if (partList.isNotEmpty) {
+                    return Expanded(
+                      child: ListView.builder(
+                        physics: AlwaysScrollableScrollPhysics(),
+                        itemCount: partList.length,
+                        shrinkWrap: true,
+                        itemBuilder: (BuildContext context, int index) {
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: <Widget>[
+                              Expanded(
+                                flex: 1,
+                                child: textData(partList[index].id.toString()),
+                              ),
+                              Expanded(
+                                flex: 3,
+                                child: textData(
+                                    partList[index].partName.toString()),
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: textData(
+                                    "${partList[index].partPrice.toString()} Rs."),
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: textData(
+                                    partList[index].partQuantity.toString()),
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: textData(
+                                    partList[index].bikeModelNo.toString()),
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      color: Colors.red,
+                                      height: 30,
+                                      width: 100,
+                                      child: IconButton(
+                                        padding: EdgeInsets.zero,
+                                        icon: const Icon(
+                                          Icons.delete,
+                                          size: 20,
+                                          color: Colors.white,
+                                        ),
+                                        onPressed: () {
+                                          onDelete(partList[index].id!);
+                                        },
+                                      ),
+                                    ),
+                                    const Divider()
+                                  ],
+                                ),
+                              )
+                            ],
+                          );
+                        },
+                      ),
+                    );
+                  } else {
+                    return Utils.noData();
+                  }
+                }),
           ],
         ));
   }

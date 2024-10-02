@@ -7,6 +7,7 @@ class CustomTextField extends StatelessWidget {
   final TextInputType? textInputType;
   final FormFieldValidator? validator;
   final ValueChanged? onChanged;
+  final ValueChanged? onSaved;
   const CustomTextField(
       {super.key,
       this.controller,
@@ -14,10 +15,12 @@ class CustomTextField extends StatelessWidget {
       this.prefixIcon,
       this.textInputType,
       this.validator,
-      this.onChanged});
+      this.onChanged,
+      this.onSaved});
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      onSaved: onSaved,
       cursorHeight: 10,
       onChanged: onChanged,
       validator: validator,
@@ -25,12 +28,12 @@ class CustomTextField extends StatelessWidget {
       keyboardType: textInputType,
       style: GoogleFonts.poppins(color: Colors.black, fontSize: 10),
       decoration: InputDecoration(
-          errorStyle: TextStyle(fontSize: 8),
-          labelStyle: TextStyle(fontSize: 10),
-          prefixIcon: prefixIcon,
-          labelText: label,
-          border: _border,
-          ),
+        errorStyle: TextStyle(fontSize: 8),
+        labelStyle: TextStyle(fontSize: 10),
+        prefixIcon: prefixIcon,
+        labelText: label,
+        border: _border,
+      ),
     );
   }
 

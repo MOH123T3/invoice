@@ -1,3 +1,5 @@
+import 'package:autorepair/data/billing_database.dart';
+import 'package:autorepair/data/product_database.dart';
 import 'package:autorepair/imports.dart';
 import 'package:autorepair/view/home/chart.dart';
 
@@ -23,6 +25,63 @@ class _HomeState extends State<Home> {
   String dropdownValue = "This month";
 
   final dash = DashboardController();
+
+  var finalBillingDatabase = FinalBillingDatabase();
+  final productListDatabase = SparePartDatabase();
+
+  List<BillingDatabase> billingListData = <BillingDatabase>[];
+
+  int totalProducts = 0;
+
+  int totalCustomers = 0;
+
+  int totalRevenue = 0;
+
+  int totalPaid = 0;
+
+  int totalDue = 0;
+
+  @override
+  void initState() {
+    super.initState();
+
+    getData();
+  }
+
+  getData() async {
+    List<int> totalTransaction = [];
+    List<int> totalPaidTransaction = [];
+    List<int> totalDueTransaction = [];
+
+    var data = await finalBillingDatabase.fetchAll();
+    billingListData = data;
+
+    for (var i = 0; i < billingListData.length; i++) {
+      totalTransaction.add(int.parse(billingListData[i].totalAmount!));
+      totalPaidTransaction.add(int.parse(billingListData[i].paidAmount!));
+      totalDueTransaction.add(int.parse(billingListData[i].dueAmount!));
+    }
+
+    var productList = await productListDatabase.fetchAll();
+    totalRevenue = totalTransaction.reduce((value, element) => value + element);
+    totalPaid =
+        totalPaidTransaction.reduce((value, element) => value + element);
+
+    totalDue = totalDueTransaction.reduce(
+      (value, element) => value + element,
+    );
+    dash.dashboardList[0].value = productList.length.toString();
+    dash.dashboardList[1].value = billingListData.length.toString();
+    dash.dashboardList[3].value = totalRevenue.toString();
+    dash.dashboardList[4].value = totalPaid.toString();
+    dash.dashboardList[5].value = totalDue.toString();
+
+    print(totalPaid);
+    print(totalRevenue);
+
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(

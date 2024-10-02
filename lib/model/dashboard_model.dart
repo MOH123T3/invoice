@@ -1,9 +1,9 @@
 import 'package:autorepair/imports.dart';
 
 class DashboardModel {
-  final String? title;
-  final String? value;
-  final IconData? icon;
+   String? title;
+   String? value;
+   IconData? icon;
 
   DashboardModel({this.title, this.value, this.icon});
 }
